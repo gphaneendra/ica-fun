@@ -1,0 +1,39 @@
+<project name="icafun" default="help" basedir=".">
+	<target name="help">
+		<echo>List of available targets</echo>
+		<echo>	help:	display this message</echo>
+		<echo>	fusc:	build project, obfuscate class files</echo>
+		<echo>	dist:	build a complete distribution (jar, dependent files, manual)</echo>
+	</target>
+
+	<target name="fusc">
+		<taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="yguard.jar">
+		</taskdef>
+		<property name="naming-scheme" value="best" />
+		<jar destfile="ica-plugin-raw.jar" basedir="bin">
+		</jar>
+		<yguard>
+			<inoutpair in="ica-plugin-raw.jar" out="ica-plugin.jar" />
+			<rename>
+				<keep>
+					<class>
+						<patternset>
+							<include name="com4j.*" />
+							<include name="org.apache.jmeter.*" />
+						</patternset>
+					</class>
+				</keep>
+			</rename>
+		</yguard>
+		<copy file="ica-plugin.jar" todir="c:/software/jakarta-jmeter-2.4/ica-plugin" />
+	</target>
+	
+	<target name="dist" depends="fusc">
+		<mkdir dir="dist"/>
+		<move file="ica-plugin.jar" todir="dist"/>
+		<copy todir="dist" file="lib/com4j.dll"/>
+		<copy todir="dist" file="lib/com4j.jar"/>
+		<copy todir="dist" file="c:/software/jakarta-jmeter-2.4/ica-plugin/icafun.pdf"/>
+		<jar basedir="dist" destfile="ica-plugin-dist.zip"/>	
+	</target>
+</project>
